@@ -138,3 +138,18 @@ export class CircuitBreaker<T = unknown> {
 
 export default CircuitBreaker;
 export type { State, CircuitBreakerOptions, Stats };
+
+// Get all circuit breakers status
+const breakers = new Map<string, CircuitBreaker<any, any>>();
+
+export function getCircuitBreakerStatus(name: string): CircuitState | undefined {
+  return breakers.get(name)?.getState();
+}
+
+export function getAllCircuitBreakers(): Map<string, CircuitState> {
+  const status = new Map<string, CircuitState>();
+  breakers.forEach((breaker, name) => {
+    status.set(name, breaker.getState());
+  });
+  return status;
+}
