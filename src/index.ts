@@ -139,17 +139,25 @@ export class CircuitBreaker<T = unknown> {
 export default CircuitBreaker;
 export type { State, CircuitBreakerOptions, Stats };
 
-// Get all circuit breakers status
-const breakers = new Map<string, CircuitBreaker<any, any>>();
+// Registry for named circuit breakers
+const registry = new Map<string, CircuitBreaker<any>>();
 
-export function getCircuitBreakerStatus(name: string): CircuitState | undefined {
-  return breakers.get(name)?.getState();
+export function registerCircuitBreaker<T>(name: string, breaker: CircuitBreaker<T>): void {
+  registry.set(name, breaker);
 }
 
-export function getAllCircuitBreakers(): Map<string, CircuitState> {
-  const status = new Map<string, CircuitState>();
-  breakers.forEach((breaker, name) => {
-    status.set(name, breaker.getState());
+export function getCircuitBreaker(name: string): CircuitBreaker | undefined {
+  return registry.get(name);
+}
+
+export function removeCircuitBreaker(name: string): boolean {
+  return registry.delete(name);
+}
+
+export function getAllCircuitBreakerStats(): Map<string, Stats> {
+  const result = new Map<string, Stats>();
+  registry.forEach((breaker, name) => {
+    result.set(name, breaker.getStats());
   });
-  return status;
+  return result;
 }
