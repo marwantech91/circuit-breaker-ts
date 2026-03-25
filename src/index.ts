@@ -134,6 +134,13 @@ export class CircuitBreaker<T = unknown> {
     this.transitionTo('OPEN');
     this.lastFailureTime = Date.now();
   }
+
+  /** Returns true if the circuit is currently allowing requests through */
+  isCallPermitted(): boolean {
+    if (this.state === 'CLOSED' || this.state === 'HALF_OPEN') return true;
+    if (this.lastFailureTime && Date.now() - this.lastFailureTime >= this.options.timeout) return true;
+    return false;
+  }
 }
 
 export default CircuitBreaker;
