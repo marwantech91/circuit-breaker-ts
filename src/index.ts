@@ -135,6 +135,13 @@ export class CircuitBreaker<T = unknown> {
     this.lastFailureTime = Date.now();
   }
 
+  /** Returns the current failure rate as a percentage (0-100) */
+  getFailureRate(): number {
+    const total = this.failures + this.successes;
+    if (total === 0) return 0;
+    return (this.failures / total) * 100;
+  }
+
   /** Returns true if the circuit is currently allowing requests through */
   isCallPermitted(): boolean {
     if (this.state === 'CLOSED' || this.state === 'HALF_OPEN') return true;
